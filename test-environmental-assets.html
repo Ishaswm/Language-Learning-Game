@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Environmental Assets Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            color: blue;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #87CEEB;
+        }
+    </style>
+</head>
+<body>
+    <h1>Environmental Assets Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Asset Loading Test</h2>
+        <div id="asset-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Environmental Elements Creation Test</h2>
+        <div id="creation-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Visual Test</h2>
+        <p>Environmental elements should be visible on the canvas below:</p>
+        <canvas id="test-canvas" width="800" height="600"></canvas>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="data/collisions.js"></script>
+    <script src="data/characters.js"></script>
+    <script src="data/newAssets.js"></script>
+    <script src="data/environmentalAssets.js"></script>
+    <script src="classes.js"></script>
+    <script src="validate-environmental-integration.js"></script>
+
+    <script>
+        // Test environmental assets
+        function runTests() {
+            const assetResults = document.getElementById('asset-test-results');
+            const creationResults = document.getElementById('creation-test-results');
+            
+            // Test 1: Check if environmental assets are loaded
+            try {
+                if (typeof environmentalAssets !== 'undefined') {
+                    assetResults.innerHTML += '<p class="success">✓ Environmental assets object loaded</p>';
+                    assetResults.innerHTML += `<p class="info">- Found ${environmentalAssets.decorations.length} decoration assets</p>`;
+                    assetResults.innerHTML += `<p class="info">- Found ${environmentalAssets.boundaries.length} boundary assets</p>`;
+                    assetResults.innerHTML += `<p class="info">- Found ${environmentalAssets.placements.length} placement configurations</p>`;
+                } else {
+                    assetResults.innerHTML += '<p class="error">✗ Environmental assets not loaded</p>';
+                }
+            } catch (error) {
+                assetResults.innerHTML += `<p class="error">✗ Error loading assets: ${error.message}</p>`;
+            }
+
+            // Test 2: Check if creation function works
+            try {
+                if (typeof createEnvironmentalElements === 'function') {
+                    creationResults.innerHTML += '<p class="success">✓ createEnvironmentalElements function available</p>';
+                    
+                    // Mock the required globals for testing
+                    window.Boundary = class {
+                        static width = 48;
+                        static height = 48;
+                        constructor({position}) {
+                            this.position = position;
+                            this.width = 48;
+                            this.height = 48;
+                        }
+                    };
+                    
+                    window.EnvironmentalElement = class {
+                        constructor(config) {
+                            this.position = config.position;
+                            this.type = config.type;
+                            this.hasCollision = config.hasCollision;
+                            this.name = config.name;
+                            this.id = config.id;
+                        }
+                    };
+
+                    const result = createEnvironmentalElements();
+                    creationResults.innerHTML += `<p class="success">✓ Created ${result.elements.length} environmental elements</p>`;
+                    creationResults.innerHTML += `<p class="success">✓ Created ${result.boundaries.length} environmental boundaries</p>`;
+                    
+                    // List created elements
+                    result.elements.forEach((element, index) => {
+                        creationResults.innerHTML += `<p class="info">- Element ${index + 1}: ${element.name} (${element.type})</p>`;
+                    });
+                    
+                } else {
+                    creationResults.innerHTML += '<p class="error">✗ createEnvironmentalElements function not available</p>';
+                }
+            } catch (error) {
+                creationResults.innerHTML += `<p class="error">✗ Error creating elements: ${error.message}</p>`;
+            }
+
+            // Test 3: Visual test
+            testVisualRendering();
+        }
+
+        function testVisualRendering() {
+            const canvas = document.getElementById('test-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid for reference
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 48) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 48) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw placeholder environmental elements
+            const offset = { x: 100, y: 100 }; // Adjust for visibility
+            
+            environmentalAssets.placements.forEach((placement, index) => {
+                const x = placement.position.x * 12 + offset.x; // Scale down for test canvas
+                const y = placement.position.y * 12 + offset.y;
+                
+                const assetData = environmentalAssets.decorations.find(d => d.id === placement.assetId) ||
+                                 environmentalAssets.boundaries.find(b => b.id === placement.assetId);
+                
+                if (assetData) {
+                    // Draw colored rectangles to represent different element types
+                    const colors = {
+                        'env1': '#4169E1', // Fountain - blue
+                        'env2': '#8B4513', // Bench - brown
+                        'env3': '#228B22', // Garden - green
+                        'env4': '#FFD700', // Lamp - gold
+                        'boundary1': '#006400', // Hedge - dark green
+                        'boundary2': '#696969'  // Rock - gray
+                    };
+                    
+                    ctx.fillStyle = colors[assetData.id] || '#FF69B4';
+                    ctx.fillRect(x - 6, y - 6, 12, 12);
+                    
+                    // Add label
+                    ctx.fillStyle = '#000';
+                    ctx.font = '8px Arial';
+                    ctx.fillText(assetData.name.substring(0, 8), x - 15, y + 20);
+                }
+            });
+            
+            // Add legend
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Arial';
+            ctx.fillText('Environmental Elements Test Visualization', 10, 20);
+            ctx.font = '10px Arial';
+            ctx.fillText('Blue: Fountain, Brown: Bench, Green: Garden, Gold: Lamp', 10, 35);
+            ctx.fillText('Dark Green: Hedge, Gray: Rock Formation', 10, 50);
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

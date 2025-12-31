@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Environmental Test</title>
+</head>
+<body>
+    <h1>Environmental Elements Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Mock required classes for testing
+        class Boundary {
+            static width = 48;
+            static height = 48;
+            constructor({position}) {
+                this.position = position;
+                this.width = 48;
+                this.height = 48;
+            }
+        }
+        
+        class Sprite {
+            constructor({position, image, frames = { max: 1, hold: 10 }, animate = false, scale = 1}) {
+                this.position = position;
+                this.image = new Image();
+                this.frames = { ...frames, val: 0, elapsed: 0 };
+                this.image.onload = () => {
+                    this.width = (this.image.width / this.frames.max) * scale;
+                    this.height = this.image.height * scale;
+                };
+                this.image.src = image.src;
+                this.animate = animate;
+                this.opacity = 1;
+                this.scale = scale;
+            }
+            
+            draw() {
+                // Mock draw method
+                console.log(`Drawing sprite at ${this.position.x}, ${this.position.y}`);
+            }
+        }
+        
+        class EnvironmentalElement extends Sprite {
+            constructor({position, image, scale = 1, type = 'decoration', hasCollision = false, name = 'Environmental Element', description = '', id = null, frames = { max: 1, hold: 10 }, animate = false}) {
+                super({position, image, frames, animate, scale});
+                this.type = type;
+                this.hasCollision = hasCollision;
+                this.name = name;
+                this.description = description;
+                this.id = id;
+                this.isEnvironmental = true;
+            }
+        }
+        
+        // Test environmental assets
+        const environmentalAssets = {
+            decorations: [
+                {
+                    id: 'env1',
+                    name: 'City Fountain',
+                    sprite: './assets/Gemini_Generated_Image_194dv5194dv5194d.png',
+                    type: 'decoration',
+                    scale: 1.5,
+                    hasCollision: true,
+                    description: 'A beautiful fountain in the city center'
+                }
+            ],
+            boundaries: [],
+            placements: [
+                {
+                    assetId: 'env1',
+                    position: { x: 25, y: 25 },
+                    gridPosition: { x: 25, y: 25 },
+                    symbol: 1040
+                }
+            ]
+        };
+        
+        function createEnvironmentalElements() {
+            const environmentalElements = [];
+            const environmentalBoundaries = [];
+            const gameOffset = { x: -735, y: -650 };
+            
+            const environmentalImages = {};
+            environmentalAssets.decorations.forEach(decoration => {
+                const img = new Image();
+                img.src = decoration.sprite;
+                environmentalImages[decoration.id] = img;
+            });
+            
+            environmentalAssets.placements.forEach((placement, index) => {
+                const assetData = environmentalAssets.decorations.find(d => d.id === placement.assetId);
+                
+                if (assetData) {
+                    try {
+                        const element = new EnvironmentalElement({
+                            position: {
+                                x: placement.position.x * Boundary.width + gameOffset.x,
+                                y: placement.position.y * Boundary.height + gameOffset.y
+                            },
+                            image: environmentalImages[placement.assetId],
+                            scale: assetData.scale,
+                            type: assetData.type,
+                            hasCollision: assetData.hasCollision,
+                            name: assetData.name,
+                            description: assetData.description,
+                            id: assetData.id
+                        });
+                        
+                        environmentalElements.push(element);
+                        
+                        if (assetData.hasCollision) {
+                            environmentalBoundaries.push(
+                                new Boundary({
+                                    position: {
+                                        x: placement.position.x * Boundary.width + gameOffset.x,
+                                        y: placement.position.y * Boundary.height + gameOffset.y
+                                    }
+                                })
+                            );
+                        }
+                    } catch (error) {
+                        console.warn(`Failed to create environmental element ${placement.assetId}:`, error);
+                    }
+                }
+            });
+            
+            return { elements: environmentalElements, boundaries: environmentalBoundaries };
+        }
+        
+        // Run test
+        const results = document.getElementById('results');
+        try {
+            const data = createEnvironmentalElements();
+            results.innerHTML = `
+                <p style="color: green;">✓ Test passed!</p>
+                <p>Created ${data.elements.length} environmental elements</p>
+                <p>Created ${data.boundaries.length} environmental boundaries</p>
+                <p>First element: ${data.elements[0] ? data.elements[0].name : 'None'}</p>
+            `;
+        } catch (error) {
+            results.innerHTML = `<p style="color: red;">✗ Test failed: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

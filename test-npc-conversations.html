@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPC Conversation Templates Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .character-header {
+            background: #333;
+            color: white;
+            padding: 10px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-result {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .topic-section {
+            margin: 15px 0;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>NPC Conversation Templates Test</h1>
+    <p>This page tests the conversation templates for each of the 4 new NPCs.</p>
+
+    <!-- Character 1: Dr. Elena Martinez -->
+    <div class="test-section">
+        <div class="character-header">
+            <h2>Character 1: Dr. Elena Martinez (Doctor)</h2>
+            <p>Role: Doctor | Personality: Helpful</p>
+        </div>
+        
+        <button onclick="testCharacterGreeting('npc1')">Test Greeting</button>
+        <button onclick="testCharacterTopics('npc1')">Test Topics</button>
+        <button onclick="testCharacterFarewell('npc1')">Test Farewell</button>
+        
+        <div id="npc1-results"></div>
+    </div>
+
+    <!-- Character 2: Marco the Shopkeeper -->
+    <div class="test-section">
+        <div class="character-header">
+            <h2>Character 2: Marco the Shopkeeper (Shopkeeper)</h2>
+            <p>Role: Shopkeeper | Personality: Friendly</p>
+        </div>
+        
+        <button onclick="testCharacterGreeting('npc2')">Test Greeting</button>
+        <button onclick="testCharacterTopics('npc2')">Test Topics</button>
+        <button onclick="testCharacterFarewell('npc2')">Test Farewell</button>
+        
+        <div id="npc2-results"></div>
+    </div>
+
+    <!-- Character 3: Sofia the Student -->
+    <div class="test-section">
+        <div class="character-header">
+            <h2>Character 3: Sofia the Student (Student)</h2>
+            <p>Role: Student | Personality: Energetic</p>
+        </div>
+        
+        <button onclick="testCharacterGreeting('npc3')">Test Greeting</button>
+        <button onclick="testCharacterTopics('npc3')">Test Topics</button>
+        <button onclick="testCharacterFarewell('npc3')">Test Farewell</button>
+        
+        <div id="npc3-results"></div>
+    </div>
+
+    <!-- Character 4: Carlos the Citizen -->
+    <div class="test-section">
+        <div class="character-header">
+            <h2>Character 4: Carlos the Citizen (Citizen)</h2>
+            <p>Role: Citizen | Personality: Casual</p>
+        </div>
+        
+        <button onclick="testCharacterGreeting('npc4')">Test Greeting</button>
+        <button onclick="testCharacterTopics('npc4')">Test Topics</button>
+        <button onclick="testCharacterFarewell('npc4')">Test Farewell</button>
+        
+        <div id="npc4-results"></div>
+    </div>
+
+    <!-- Test All Characters -->
+    <div class="test-section">
+        <div class="character-header">
+            <h2>Test All Characters</h2>
+        </div>
+        
+        <button onclick="testAllCharacters()">Run All Tests</button>
+        <button onclick="clearAllResults()">Clear Results</button>
+        
+        <div id="all-results"></div>
+    </div>
+
+    <!-- Load the conversation templates -->
+    <script src="data/npcConversationTemplates.js"></script>
+
+    <script>
+        function testCharacterGreeting(npcId) {
+            const resultsDiv = document.getElementById(`${npcId}-results`);
+            const greeting = NPCTemplateUtils.getRandomGreeting(npcId);
+            
+            resultsDiv.innerHTML += `
+                <div class="test-result">
+                    <strong>Greeting:</strong> "${greeting}"
+                </div>
+            `;
+        }
+
+        function testCharacterTopics(npcId) {
+            const resultsDiv = document.getElementById(`${npcId}-results`);
+            const topics = NPCTemplateUtils.getAllTopics(npcId);
+            
+            let topicsHTML = '<div class="test-result"><strong>Available Topics:</strong><br>';
+            
+            topics.forEach(topic => {
+                const prompt = NPCTemplateUtils.getRandomPrompt(npcId, topic);
+                topicsHTML += `
+                    <div class="topic-section">
+                        <strong>${topic}:</strong> "${prompt}"
+                    </div>
+                `;
+            });
+            
+            topicsHTML += '</div>';
+            resultsDiv.innerHTML += topicsHTML;
+        }
+
+        function testCharacterFarewell(npcId) {
+            const resultsDiv = document.getElementById(`${npcId}-results`);
+            const farewell = NPCTemplateUtils.getRandomFarewell(npcId);
+            
+            resultsDiv.innerHTML += `
+                <div class="test-result">
+                    <strong>Farewell:</strong> "${farewell}"
+                </div>
+            `;
+        }
+
+        function testAllCharacters() {
+            const allResultsDiv = document.getElementById('all-results');
+            let allHTML = '<div class="test-result"><h3>Complete Test Results</h3>';
+            
+            ['npc1', 'npc2', 'npc3', 'npc4'].forEach(npcId => {
+                const template = NPCTemplateUtils.getTemplate(npcId);
+                if (template) {
+                    allHTML += `
+                        <div class="topic-section">
+                            <h4>${template.character.name} (${template.character.role})</h4>
+                            <p><strong>Greeting:</strong> "${NPCTemplateUtils.getRandomGreeting(npcId)}"</p>
+                            <p><strong>Topics:</strong> ${NPCTemplateUtils.getAllTopics(npcId).join(', ')}</p>
+                            <p><strong>Farewell:</strong> "${NPCTemplateUtils.getRandomFarewell(npcId)}"</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            allHTML += '</div>';
+            allResultsDiv.innerHTML = allHTML;
+        }
+
+        function clearAllResults() {
+            ['npc1', 'npc2', 'npc3', 'npc4', 'all'].forEach(id => {
+                const div = document.getElementById(`${id}-results`);
+                if (div) div.innerHTML = '';
+            });
+        }
+
+        // Test that templates are loaded correctly
+        window.addEventListener('load', () => {
+            console.log('Testing NPC Conversation Templates...');
+            
+            // Test each character
+            ['npc1', 'npc2', 'npc3', 'npc4'].forEach(npcId => {
+                const template = NPCTemplateUtils.getTemplate(npcId);
+                console.log(`${npcId}:`, template ? 'Template loaded successfully' : 'Template not found');
+                
+                if (template) {
+                    console.log(`  - Character: ${template.character.name}`);
+                    console.log(`  - Role: ${template.character.role}`);
+                    console.log(`  - Personality: ${template.character.personality}`);
+                    console.log(`  - Topics: ${NPCTemplateUtils.getAllTopics(npcId).length}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

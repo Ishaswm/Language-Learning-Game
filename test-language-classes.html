@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Language Learning Classes Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Language Learning Classes Test</h1>
+    
+    <div class="test-section">
+        <h2>VoiceProcessor Test</h2>
+        <div id="voice-test-result"></div>
+        <button onclick="testVoiceProcessor()">Test VoiceProcessor</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>ConversationManager Test</h2>
+        <div id="conversation-test-result"></div>
+        <button onclick="testConversationManager()">Test ConversationManager</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>ScenarioEngine Test</h2>
+        <div id="scenario-test-result"></div>
+        <button onclick="testScenarioEngine()">Test ScenarioEngine</button>
+    </div>
+
+    <script src="js/VoiceProcessor.js"></script>
+    <script src="js/ConversationManager.js"></script>
+    <script src="js/ScenarioEngine.js"></script>
+    
+    <script>
+        function testVoiceProcessor() {
+            const resultDiv = document.getElementById('voice-test-result');
+            try {
+                const voiceProcessor = new VoiceProcessor();
+                
+                // Test basic functionality
+                const isSupported = voiceProcessor.isVoiceSupported();
+                const isRecording = voiceProcessor.isCurrentlyRecording();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✓ VoiceProcessor created successfully</div>
+                    <div>Voice supported: ${isSupported}</div>
+                    <div>Currently recording: ${isRecording}</div>
+                    <div>Transcription: "${voiceProcessor.getTranscription()}"</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testConversationManager() {
+            const resultDiv = document.getElementById('conversation-test-result');
+            try {
+                const conversationManager = new ConversationManager();
+                
+                // Test starting a conversation
+                const conversation = conversationManager.startConversation('npc', 'villager', {});
+                
+                // Test adding messages
+                conversationManager.processPlayerResponse('Hello, how are you?');
+                
+                // Test getting statistics
+                const stats = conversationManager.getStatistics();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✓ ConversationManager created successfully</div>
+                    <div>Conversation ID: ${conversation.id}</div>
+                    <div>Is active: ${conversationManager.isConversationActive()}</div>
+                    <div>Message count: ${conversation.messages.length}</div>
+                    <div>Turn count: ${conversation.turnCount}</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testScenarioEngine() {
+            const resultDiv = document.getElementById('scenario-test-result');
+            try {
+                const scenarioEngine = new ScenarioEngine();
+                
+                // Test loading scenarios
+                const hospitalScenarios = scenarioEngine.loadScenario('hospital');
+                const cafeScenario = scenarioEngine.getScenario('cafe', 'cafe_ordering');
+                const beginnerScenarios = scenarioEngine.getScenariosByDifficulty('shop', 'beginner');
+                
+                // Test generating prompts
+                const prompt = scenarioEngine.generatePrompt(cafeScenario);
+                
+                // Test statistics
+                const stats = scenarioEngine.getScenarioStatistics();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✓ ScenarioEngine created successfully</div>
+                    <div>Hospital scenarios: ${hospitalScenarios ? hospitalScenarios.scenarios.length : 0}</div>
+                    <div>Cafe ordering scenario: ${cafeScenario ? cafeScenario.title : 'Not found'}</div>
+                    <div>Beginner shop scenarios: ${beginnerScenarios.length}</div>
+                    <div>Total scenarios: ${stats.totalScenarios}</div>
+                    <div>Total buildings: ${stats.totalBuildings}</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">✗ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.onload = function() {
+            testVoiceProcessor();
+            testConversationManager();
+            testScenarioEngine();
+        };
+    </script>
+</body>
+</html>

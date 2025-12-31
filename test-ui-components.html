@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Components Test - Language Learning RPG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+        * {
+            font-family: 'Press Start 2P', cursive;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            border: 2px solid #4CAF50;
+        }
+        .test-button {
+            padding: 12px 24px;
+            margin: 8px;
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        h1, h2 {
+            color: #4CAF50;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>UI Components Test</h1>
+        
+        <div class="test-section">
+            <h2>DialogueUI Tests</h2>
+            <button class="test-button" onclick="testScenarioPrompt()">Test Scenario Prompt</button>
+            <button class="test-button" onclick="testConversation()">Test Conversation</button>
+            <button class="test-button" onclick="testVoiceInput()">Test Voice Input</button>
+        </div>
+
+        <div class="test-section">
+            <h2>FeedbackModal Tests</h2>
+            <button class="test-button" onclick="testFeedback()">Test Feedback Modal</button>
+            <button class="test-button" onclick="testProgress()">Test Progress Dashboard</button>
+        </div>
+
+        <div class="test-section">
+            <h2>MenuSystem Tests</h2>
+            <button class="test-button" onclick="testMainMenu()">Test Main Menu</button>
+            <button class="test-button" onclick="testInGameMenu()">Test In-Game Menu</button>
+            <button class="test-button" onclick="testSettings()">Test Settings</button>
+            <button class="test-button" onclick="testLanguageSelector()">Test Language Selector</button>
+        </div>
+    </div>
+
+    <!-- Include all UI components -->
+    <script src="js/DialogueUI.js"></script>
+    <script src="js/FeedbackModal.js"></script>
+    <script src="js/MenuSystem.js"></script>
+
+    <script>
+        // Initialize UI components
+        let dialogueUI, feedbackModal, menuSystem;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            dialogueUI = new DialogueUI()
+            feedbackModal = new FeedbackModal()
+            menuSystem = new MenuSystem(null)
+
+            // Set up callbacks
+            dialogueUI.onVoiceStart(() => {
+                console.log('Voice recording started')
+                dialogueUI.updateVisualFeedback('recording')
+            })
+
+            dialogueUI.onVoiceStop(() => {
+                console.log('Voice recording stopped')
+                dialogueUI.updateVisualFeedback('processing')
+                setTimeout(() => {
+                    dialogueUI.updateVisualFeedback('stopped', 'Hello, this is a test transcription!')
+                }, 2000)
+            })
+
+            dialogueUI.onTextSubmit((text) => {
+                console.log('Text submitted:', text)
+                // Simulate adding message to conversation
+                dialogueUI.addMessage({
+                    speaker: 'player',
+                    content: text,
+                    timestamp: new Date()
+                })
+                
+                // Simulate NPC response
+                setTimeout(() => {
+                    dialogueUI.addMessage({
+                        speaker: 'npc',
+                        content: 'That\'s interesting! Tell me more about that.',
+                        timestamp: new Date()
+                    })
+                }, 1000)
+            })
+
+            dialogueUI.onClose(() => {
+                console.log('Dialogue closed')
+            })
+
+            feedbackModal.onClose(() => {
+                console.log('Feedback modal closed')
+            })
+
+            feedbackModal.onContinue(() => {
+                console.log('Continue learning clicked')
+            })
+
+            menuSystem.onStartGame(() => {
+                console.log('Game started')
+            })
+
+            menuSystem.onLanguageChange((language) => {
+                console.log('Language changed to:', language)
+            })
+
+            menuSystem.onSettingsChange((settings) => {
+                console.log('Settings changed:', settings)
+            })
+        })
+
+        // Test functions
+        function testScenarioPrompt() {
+            dialogueUI.showScenarioPrompt(
+                'Hospital Appointment',
+                'You need to call the hospital to schedule a check-up appointment. The receptionist will help you find an available time.',
+                {
+                    setting: 'Hospital reception desk',
+                    role: 'Patient calling to make an appointment',
+                    goal: 'Successfully schedule an appointment'
+                }
+            )
+        }
+
+        function testConversation() {
+            const messages = [
+                {
+                    speaker: 'system',
+                    content: 'Conversation started with Dr. Smith',
+                    timestamp: new Date(Date.now() - 60000)
+                },
+                {
+                    speaker: 'npc',
+                    content: 'Hello! How can I help you today?',
+                    timestamp: new Date(Date.now() - 45000)
+                },
+                {
+                    speaker: 'player',
+                    content: 'Hi, I would like to schedule an appointment.',
+                    timestamp: new Date(Date.now() - 30000)
+                },
+                {
+                    speaker: 'npc',
+                    content: 'Of course! What type of appointment do you need?',
+                    timestamp: new Date(Date.now() - 15000)
+                }
+            ]
+            dialogueUI.displayConversation(messages)
+        }
+
+        function testVoiceInput() {
+            dialogueUI.showVoiceInput()
+        }
+
+        function testFeedback() {
+            const strengths = [
+                'Great use of polite language!',
+                'Excellent pronunciation of medical terms',
+                'Good use of "please" and "thank you"'
+            ]
+            
+            const improvements = [
+                'Try to speak a bit more slowly',
+                'Practice using more specific time expressions',
+                'Work on asking follow-up questions'
+            ]
+            
+            const skillMetrics = {
+                vocabulary: 85,
+                fluency: 72,
+                pronunciation: 90,
+                grammar: 78
+            }
+            
+            feedbackModal.showImmediateFeedback(strengths, improvements, skillMetrics)
+        }
+
+        function testProgress() {
+            const sessionData = {
+                conversationCount: 12,
+                totalTurns: 48,
+                timeSpent: 1800000, // 30 minutes
+                scenariosCompleted: 8,
+                overallSkills: {
+                    vocabulary: 78,
+                    fluency: 65,
+                    pronunciation: 82,
+                    grammar: 71
+                }
+            }
+            
+            feedbackModal.displayProgressSummary(sessionData)
+        }
+
+        function testMainMenu() {
+            menuSystem.showMainMenu()
+        }
+
+        function testInGameMenu() {
+            menuSystem.showInGameMenu()
+        }
+
+        function testSettings() {
+            menuSystem.showSettings()
+        }
+
+        function testLanguageSelector() {
+            menuSystem.showLanguageSelector()
+        }
+    </script>
+</body>
+</html>
